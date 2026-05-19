@@ -59,7 +59,12 @@ public class EnemyAi : MonoBehaviour
     {
         if (HasPatrolPoints)
         {
-        
+            ChangeState(EnemyStates.Patrol);
+        }
+
+        else
+        {
+            ChangeState(EnemyStates.Idle);
         }
     }
 
@@ -67,6 +72,7 @@ public class EnemyAi : MonoBehaviour
     void Update()
     {
         CheckForPlayer();
+        UpdateAnimation();
 
         switch (currentState)
         {
@@ -86,7 +92,11 @@ public class EnemyAi : MonoBehaviour
 
     private void CheckForPlayer()
     {
+        if (player == null)
+            return;
+
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+
         if (currentState != EnemyStates.Chase && distanceToPlayer <= chaseRange)
         {
             ChangeState(EnemyStates.Chase);
@@ -104,8 +114,8 @@ public class EnemyAi : MonoBehaviour
             return;
 
         stateInitialized = true;
-
         currentState = newState;
+        
         switch (currentState)
         {
             case EnemyStates.Idle:
@@ -129,7 +139,7 @@ public class EnemyAi : MonoBehaviour
 
     private void UpdateIdle()
     {
-
+        
     }
 
     private void EnterPatrol()
@@ -138,11 +148,33 @@ public class EnemyAi : MonoBehaviour
         agent.speed = walkSpeed;
         agent.stoppingDistance = patrolStopDistance;
         waitTimer = 0;
+
+        agent.ResetPath();
+        SetCurrentPatrolDestination();
     }
 
     private void UpdatePatrol()
     {
+        if (!HasPatrolPoints)
+        {
+            ChangeState(EnemyStates.Idle);
+        }
 
+        if (!ReachedDestination())
+        {
+            return;
+        }
+
+        agent.isStopped = true;
+
+        waitTimer += Time.deltaTime;
+        if (waitTimer >= waitTimeAtWaypoin)
+        {
+            waitTimer = 0;
+            ChooseNextPatrolPoint();
+            agent.isStopped = false;
+            SetCurrentPatrolDestination();
+        }
     }
 
     private void EnterChase()
@@ -155,7 +187,34 @@ public class EnemyAi : MonoBehaviour
 
     private void UpdateChase()
     {
+        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
 
+        if (player == null)
+        {
+            if (HasPatrolPoints)
+            {
+                ChangeState(EnemyStates.Patrol);
+            }
+
+            else
+            {
+                ChangeState(EnemyStates.Idle);
+            }
+
+            return;
+        }
+
+        if (distanceToPlayer <= chaseStopDistance)
+        {
+            agent.isStopped = true;
+            agent.ResetPath();
+        }
+
+        else
+        {
+            agent.isStopped = false;
+            agent.SetDestination(player.position);
+        }
     }
 
     private bool ReachedDestination()
@@ -195,7 +254,47 @@ public class EnemyAi : MonoBehaviour
 
     private void ChooseNextPatrolPoint()
     {
+        if (!HasPatrolPoints)
+        {
+            return;
+        }
 
+        if (randomPatrol && patrolPoints.Length > 1)
+        {
+            int nextIndex = patrolIndex;
+            while (nextIndex == patrolIndex)
+            {
+                nextIndex = Random.Range(0, patrolPoints.Length);
+            }
+            patrolIndex = nextIndex;
+        }
+        else
+        {
+            patrolIndex++;
+
+            if (patrolIndex >= patrolPoints.Length)
+            {
+                patrolIndex = 0;
+            }
+        }
+    }
+
+    private void UpdateAnimation()
+    {
+        float animationSpeed = 0;
+
+        bool isMoving = agent.velocity.magnitude > 0.5 && !agent.isStopped;
+        if (currentState == EnemyStates.Patrol && isMoving)
+        {
+            animationSpeed = 0.5f;
+        }
+
+        else if (currentState == EnemyStates.Chase && isMoving)
+        {
+            animationSpeed = 1.0f;
+        }
+
+        animator.SetFloat(speedParam, animationSpeed, animDampTime, Time.deltaTime);
     }
 
     private void OnDrawGizmos()
@@ -205,5 +304,14 @@ public class EnemyAi : MonoBehaviour
 
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, loseRange);
+
+        if (patrolPoints == null)
+            return;
+
+        Gizmos.color = Color.yellow;
+        foreach (Transform point in patrolPoints)
+        {
+            Gizmos.DrawLine(transform.position, point.position);
+        }
     }
 }
