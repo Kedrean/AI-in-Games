@@ -25,18 +25,12 @@ public class EnemyAi : MonoBehaviour
     [SerializeField] string speedParam = "Speed";
     [SerializeField] float animDampTime = 0.1f;
 
-    [Header("Attack")]
-    [SerializeField] float attackRange = 1.5f;
-    [SerializeField] float attackCooldown = 1.2f;
-    [SerializeField] string attackTrigger = "Attack";
-
     private NavMeshAgent agent;
     private Animator animator;
     private EnemyStates currentState;
     private bool stateInitialized;
     private int patrolIndex;
     private float waitTimer;
-    private float lastAttackTime;
 
     private bool HasPatrolPoints
     {
@@ -50,8 +44,7 @@ public class EnemyAi : MonoBehaviour
     {
         Idle,
         Patrol,
-        Chase,
-        Attack
+        Chase
     }
 
     private void Awake()
@@ -92,9 +85,6 @@ public class EnemyAi : MonoBehaviour
             case EnemyStates.Chase:
                 UpdateChase();
                 break;
-            case EnemyStates.Attack:
-                UpdateAttack();
-                break;
             default:
                 break;
         }
@@ -107,12 +97,7 @@ public class EnemyAi : MonoBehaviour
 
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
 
-        if (distanceToPlayer <= attackRange) 
-        {
-            ChangeState(EnemyStates.Attack);
-        }
-
-        else if (currentState != EnemyStates.Chase && distanceToPlayer <= chaseRange)
+        if (currentState != EnemyStates.Chase && distanceToPlayer <= chaseRange)
         {
             ChangeState(EnemyStates.Chase);
         }
@@ -141,9 +126,6 @@ public class EnemyAi : MonoBehaviour
                 break;
             case EnemyStates.Chase:
                 EnterChase();
-                break;
-            case EnemyStates.Attack:
-                EnterAttack();
                 break;
         }
     }
@@ -232,48 +214,6 @@ public class EnemyAi : MonoBehaviour
         {
             agent.isStopped = false;
             agent.SetDestination(player.position);
-        }
-    }
-
-    private void EnterAttack()
-    {
-        agent.isStopped = true;
-        agent.ResetPath();
-    }
-
-    private void UpdateAttack()
-    {
-        if (player == null)
-        return;
-
-        // Face player smoothly
-        Vector3 direction = (player.position - transform.position).normalized;
-        direction.y = 0;
-
-        if (direction != Vector3.zero)
-        {
-            Quaternion lookRotation = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Slerp(
-                transform.rotation,
-                lookRotation,
-                facePlayerSpeed * Time.deltaTime
-            );
-        }
-
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
-
-        // Return to chase if player escaped
-        if (distanceToPlayer > attackRange)
-        {
-            ChangeState(EnemyStates.Chase);
-            return;
-        }
-
-        // Play attack animation
-        if (Time.time >= lastAttackTime + attackCooldown)
-        {
-            lastAttackTime = Time.time;
-            animator.SetTrigger(attackTrigger);
         }
     }
 

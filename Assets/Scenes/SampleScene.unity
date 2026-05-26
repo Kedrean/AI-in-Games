@@ -925,12 +925,8 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 955734789}
     - target: {fileID: 3289536637094226255, guid: d2f2c1674d4dc2d4fad335aaee79b902, type: 3}
-      propertyPath: loseRange
-      value: 12
-      objectReference: {fileID: 0}
-    - target: {fileID: 3289536637094226255, guid: d2f2c1674d4dc2d4fad335aaee79b902, type: 3}
       propertyPath: chaseRange
-      value: 5
+      value: 7.67
       objectReference: {fileID: 0}
     - target: {fileID: 3289536637094226255, guid: d2f2c1674d4dc2d4fad335aaee79b902, type: 3}
       propertyPath: 'patrolPoints.Array.data[0]'
