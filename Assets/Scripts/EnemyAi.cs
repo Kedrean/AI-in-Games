@@ -21,6 +21,11 @@ public class EnemyAi : MonoBehaviour
     [SerializeField] bool randomPatrol = false;
     [SerializeField] float facePlayerSpeed = 8f;
 
+    [Header("Attack")]
+    [SerializeField] string attackTrigger = "Attack";
+    [SerializeField] float attackCooldown = 1.2f;
+    [SerializeField] private float attackRange = 0.75f;
+
     [Header("Animation")]
     [SerializeField] string speedParam = "Speed";
     [SerializeField] float animDampTime = 0.1f;
@@ -31,6 +36,7 @@ public class EnemyAi : MonoBehaviour
     private bool stateInitialized;
     private int patrolIndex;
     private float waitTimer;
+    private float attackTimer;
 
     private bool HasPatrolPoints
     {
@@ -44,7 +50,8 @@ public class EnemyAi : MonoBehaviour
     {
         Idle,
         Patrol,
-        Chase
+        Chase,
+        Attack
     }
 
     private void Awake()
@@ -85,6 +92,9 @@ public class EnemyAi : MonoBehaviour
             case EnemyStates.Chase:
                 UpdateChase();
                 break;
+            case EnemyStates.Attack:
+                UpdateAttack();
+                break;
             default:
                 break;
         }
@@ -95,9 +105,14 @@ public class EnemyAi : MonoBehaviour
         if (player == null)
             return;
 
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        float distanceToPlayer = DistanceToPlayerXZ();
 
-        if (currentState != EnemyStates.Chase && distanceToPlayer <= chaseRange)
+        if (distanceToPlayer <= attackRange)
+        {
+            ChangeState(EnemyStates.Attack);
+        }
+
+        else if (currentState != EnemyStates.Chase && distanceToPlayer <= chaseRange)
         {
             ChangeState(EnemyStates.Chase);
         }
@@ -126,6 +141,9 @@ public class EnemyAi : MonoBehaviour
                 break;
             case EnemyStates.Chase:
                 EnterChase();
+                break;
+            case EnemyStates.Attack:
+                EnterAttack();
                 break;
         }
     }
@@ -187,33 +205,79 @@ public class EnemyAi : MonoBehaviour
 
     private void UpdateChase()
     {
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
-
         if (player == null)
         {
-            if (HasPatrolPoints)
-            {
-                ChangeState(EnemyStates.Patrol);
-            }
-
-            else
-            {
-                ChangeState(EnemyStates.Idle);
-            }
-
+            ChangeState(HasPatrolPoints ? EnemyStates.Patrol : EnemyStates.Idle);
             return;
         }
 
+        float distanceToPlayer = DistanceToPlayerXZ();
+
+        // Always follow player first
+        agent.SetDestination(player.position);
+
+        // Stop near player
         if (distanceToPlayer <= chaseStopDistance)
         {
             agent.isStopped = true;
-            agent.ResetPath();
+            agent.velocity = Vector3.zero;
+
+            ChangeState(EnemyStates.Attack);
         }
 
         else
         {
             agent.isStopped = false;
-            agent.SetDestination(player.position);
+        }
+    }
+
+    private void EnterAttack()
+    {
+        agent.isStopped = true;
+        agent.ResetPath();
+
+        attackTimer = 0;
+
+        animator.ResetTrigger(attackTrigger);
+        animator.SetTrigger(attackTrigger);
+    }
+
+    private void UpdateAttack()
+    {
+        if (player == null)
+            return;
+
+        // Face the player
+        Vector3 lookDirection = (player.position - transform.position).normalized;
+        lookDirection.y = 0;
+
+        if (lookDirection != Vector3.zero)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(lookDirection);
+            transform.rotation = Quaternion.Slerp(
+                transform.rotation,
+                targetRotation,
+                facePlayerSpeed * Time.deltaTime
+            );
+        }
+
+        float distanceToPlayer = DistanceToPlayerXZ();
+
+        // Player moved away
+        if (distanceToPlayer > attackRange)
+        {
+            ChangeState(EnemyStates.Chase);
+            return;
+        }
+
+        attackTimer += Time.deltaTime;
+
+        if (attackTimer >= attackCooldown)
+        {
+            attackTimer = 0;
+
+            animator.ResetTrigger(attackTrigger);
+            animator.SetTrigger(attackTrigger);
         }
     }
 
@@ -313,5 +377,13 @@ public class EnemyAi : MonoBehaviour
         {
             Gizmos.DrawLine(transform.position, point.position);
         }
+    }
+
+    private float DistanceToPlayerXZ()
+    {
+        Vector2 enemyPos = new Vector2(transform.position.x, transform.position.z);
+        Vector2 playerPos = new Vector2(player.position.x, player.position.z);
+
+        return Vector2.Distance(enemyPos, playerPos);
     }
 }
