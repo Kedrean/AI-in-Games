@@ -5,10 +5,20 @@ public class LeaderBase : MonoBehaviour
 {
     public Color teamColor;
 
+    public float collectRadius = 2f;
+    public float combatRadius = 1.5f;
+
     [HideInInspector]
     public List<NeutralUnit> followers = new();
 
     public int FollowerCount => followers.Count;
+
+    private void Update()
+    {
+        CollectNearbyNeutrals();
+
+        CheckLeaderCombat();
+    }
 
     public void AddFollower(NeutralUnit unit)
     {
@@ -25,24 +35,70 @@ public class LeaderBase : MonoBehaviour
         followers.Remove(unit);
     }
 
-    private void OnCollisionEnter(Collision collision)
+    void CollectNearbyNeutrals()
     {
-        LeaderBase other = collision.gameObject.GetComponent<LeaderBase>();
+        Collider[] hits =
+            Physics.OverlapSphere(
+                transform.position,
+                collectRadius);
 
-        if (other == null)
-            return;
-
-        if (other == this)
-            return;
-
-        if (FollowerCount > other.FollowerCount)
+        foreach (Collider hit in hits)
         {
-            Destroy(other.gameObject);
+            NeutralUnit neutral =
+                hit.GetComponent<NeutralUnit>();
+
+            if (neutral == null)
+                continue;
+
+            if (neutral.leader != null)
+                continue;
+
+            AddFollower(neutral);
         }
+    }
 
-        else if (FollowerCount < other.FollowerCount)
+    void CheckLeaderCombat()
+    {
+        LeaderBase[] leaders =
+            FindObjectsByType<LeaderBase>(
+                FindObjectsSortMode.None);
+
+        foreach (LeaderBase other in leaders)
         {
-            Destroy(gameObject);
+            if (other == this)
+                continue;
+
+            float distance =
+                Vector3.Distance(
+                    transform.position,
+                    other.transform.position);
+
+            if (distance > combatRadius)
+                continue;
+
+            if (FollowerCount >
+                other.FollowerCount)
+            {
+                Destroy(other.gameObject);
+            }
+
+            else if
+                (FollowerCount <
+                 other.FollowerCount)
+            {
+                Destroy(gameObject);
+            }
+        }
+    }
+
+    private void OnDestroy()
+    {
+        foreach (NeutralUnit follower in followers)
+        {
+            if (follower != null)
+            {
+                follower.leader = null;
+            }
         }
     }
 }

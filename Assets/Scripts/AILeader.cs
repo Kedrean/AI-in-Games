@@ -11,9 +11,12 @@ public class AILeader : MonoBehaviour
     public float detectRadius = 20f;
     public float fleeDistance = 15f;
 
+    public float neutralSearchRadius = 50f;
+
     private void Start()
     {
         agent = GetComponent<NavMeshAgent>();
+
         PickRandomDestination();
     }
 
@@ -21,17 +24,25 @@ public class AILeader : MonoBehaviour
     {
         timer += Time.deltaTime;
 
+        if (timer < 0.5f)
+            return;
+
+        timer = 0f;
+
         LeaderBase myLeader = GetComponent<LeaderBase>();
 
         Collider[] hits =
-            Physics.OverlapSphere(transform.position, detectRadius);
+            Physics.OverlapSphere(
+                transform.position,
+                detectRadius);
 
         LeaderBase strongestThreat = null;
         LeaderBase weakestTarget = null;
 
         foreach (Collider hit in hits)
         {
-            LeaderBase leader = hit.GetComponent<LeaderBase>();
+            LeaderBase leader =
+                hit.GetComponent<LeaderBase>();
 
             if (leader == null)
                 continue;
@@ -39,12 +50,15 @@ public class AILeader : MonoBehaviour
             if (leader == myLeader)
                 continue;
 
-            if (myLeader.FollowerCount > leader.FollowerCount + 3)
+            if (myLeader.FollowerCount >
+                leader.FollowerCount + 3)
             {
                 weakestTarget = leader;
             }
 
-            else if (leader.FollowerCount > myLeader.FollowerCount + 3)
+            else if
+                (leader.FollowerCount >
+                 myLeader.FollowerCount + 3)
             {
                 strongestThreat = leader;
             }
@@ -52,37 +66,99 @@ public class AILeader : MonoBehaviour
 
         if (strongestThreat != null)
         {
-            Vector3 dir = (transform.position - strongestThreat.transform.position).normalized;
+            Vector3 dir =
+                (transform.position -
+                 strongestThreat.transform.position).normalized;
 
-            Vector3 fleePos = transform.position + dir * fleeDistance;
+            Vector3 fleePos =
+                transform.position +
+                dir * fleeDistance;
 
-            agent.SetDestination(fleePos);
+            NavMeshHit hit;
+
+            if (NavMesh.SamplePosition(
+                fleePos,
+                out hit,
+                fleeDistance,
+                NavMesh.AllAreas))
+            {
+                agent.SetDestination(hit.position);
+            }
 
             return;
         }
 
         if (weakestTarget != null)
         {
-            agent.SetDestination(weakestTarget.transform.position);
+            agent.SetDestination(
+                weakestTarget.transform.position);
 
             return;
         }
 
-        if (!agent.pathPending && agent.remainingDistance < 2f)
+        NeutralUnit nearestNeutral =
+            FindNearestNeutral();
+
+        if (nearestNeutral != null)
+        {
+            agent.SetDestination(
+                nearestNeutral.transform.position);
+
+            return;
+        }
+
+        if (!agent.pathPending &&
+            agent.remainingDistance < 2f)
         {
             PickRandomDestination();
         }
     }
 
+    NeutralUnit FindNearestNeutral()
+    {
+        NeutralUnit[] neutrals =
+            FindObjectsByType<NeutralUnit>(
+                FindObjectsSortMode.None);
+
+        NeutralUnit closest = null;
+
+        float bestDistance =
+            Mathf.Infinity;
+
+        foreach (NeutralUnit neutral in neutrals)
+        {
+            if (neutral.leader != null)
+                continue;
+
+            float distance =
+                Vector3.Distance(
+                    transform.position,
+                    neutral.transform.position);
+
+            if (distance < bestDistance)
+            {
+                bestDistance = distance;
+                closest = neutral;
+            }
+        }
+
+        return closest;
+    }
+
     void PickRandomDestination()
     {
-        Vector3 random = Random.insideUnitSphere * 30f;
+        Vector3 random =
+            Random.insideUnitSphere * 30f;
 
         random += transform.position;
 
         NavMeshHit hit;
 
-        if (NavMesh.SamplePosition(random, out hit, 30f, NavMesh.AllAreas))
+        if (NavMesh.SamplePosition(
+            random,
+            out hit,
+            30f,
+            NavMesh.AllAreas))
         {
             agent.SetDestination(hit.position);
         }

@@ -11,13 +11,38 @@ public class CameraFollow : MonoBehaviour
     [Header("Movement")]
     public float followSpeed = 8f;
 
+    [Header("Rotation")]
+    public float rotationSpeed = 5f;
+
     private void LateUpdate()
     {
         if (target == null)
             return;
 
-        Vector3 desiredPosition = target.position + offset;
+        Quaternion targetRotation =
+            Quaternion.LookRotation(target.forward, Vector3.up);
 
-        transform.position = Vector3.Lerp(transform.position, desiredPosition, followSpeed * Time.deltaTime);
+        Vector3 rotatedOffset =
+            targetRotation * offset;
+
+        Vector3 desiredPosition =
+            target.position + rotatedOffset;
+
+        transform.position =
+            Vector3.Lerp(
+                transform.position,
+                desiredPosition,
+                followSpeed * Time.deltaTime);
+
+        Quaternion desiredRotation =
+            Quaternion.LookRotation(
+                target.position - transform.position,
+                Vector3.up);
+
+        transform.rotation =
+            Quaternion.Slerp(
+                transform.rotation,
+                desiredRotation,
+                rotationSpeed * Time.deltaTime);
     }
 }
