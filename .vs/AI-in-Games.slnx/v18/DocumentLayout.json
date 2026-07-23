@@ -1,0 +1,105 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "E:\\GitHub\\AI-in-Games\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|e:\\github\\ai-in-games\\assets\\scripts\\stoplight.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\stoplight.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|e:\\github\\ai-in-games\\assets\\scripts\\carspawner.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\carspawner.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|e:\\github\\ai-in-games\\assets\\scripts\\carai.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\carai.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|e:\\github\\ai-in-games\\assets\\scripts\\pedestrianspawner.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\pedestrianspawner.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|e:\\github\\ai-in-games\\assets\\scripts\\pedestrianai.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\pedestrianai.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "StopLight.cs",
+              "DocumentMoniker": "E:\\GitHub\\AI-in-Games\\Assets\\Scripts\\StopLight.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\StopLight.cs",
+              "ToolTip": "E:\\GitHub\\AI-in-Games\\Assets\\Scripts\\StopLight.cs",
+              "RelativeToolTip": "Assets\\Scripts\\StopLight.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAHQAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-20T10:28:44.774Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "PedestrianSpawner.cs",
+              "DocumentMoniker": "E:\\GitHub\\AI-in-Games\\Assets\\Scripts\\PedestrianSpawner.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\PedestrianSpawner.cs",
+              "ToolTip": "E:\\GitHub\\AI-in-Games\\Assets\\Scripts\\PedestrianSpawner.cs",
+              "RelativeToolTip": "Assets\\Scripts\\PedestrianSpawner.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAQAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-20T09:52:52.002Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "PedestrianAI.cs",
+              "DocumentMoniker": "E:\\GitHub\\AI-in-Games\\Assets\\Scripts\\PedestrianAI.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\PedestrianAI.cs",
+              "ToolTip": "E:\\GitHub\\AI-in-Games\\Assets\\Scripts\\PedestrianAI.cs",
+              "RelativeToolTip": "Assets\\Scripts\\PedestrianAI.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-20T09:52:51.192Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "CarSpawner.cs",
+              "DocumentMoniker": "E:\\GitHub\\AI-in-Games\\Assets\\Scripts\\CarSpawner.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\CarSpawner.cs",
+              "ToolTip": "E:\\GitHub\\AI-in-Games\\Assets\\Scripts\\CarSpawner.cs",
+              "RelativeToolTip": "Assets\\Scripts\\CarSpawner.cs",
+              "ViewState": "AgIAADMAAAAAAAAAAAAYwEQAAAA0AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-20T09:52:50.479Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "CarAI.cs",
+              "DocumentMoniker": "E:\\GitHub\\AI-in-Games\\Assets\\Scripts\\CarAI.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\CarAI.cs",
+              "ToolTip": "E:\\GitHub\\AI-in-Games\\Assets\\Scripts\\CarAI.cs",
+              "RelativeToolTip": "Assets\\Scripts\\CarAI.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAAUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-20T09:12:20.402Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

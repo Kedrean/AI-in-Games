@@ -1,0 +1,54 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "E:\\GitHub\\AI-in-Games\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|e:\\github\\ai-in-games\\assets\\scripts\\carai.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\carai.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|e:\\github\\ai-in-games\\assets\\scripts\\stoplight.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B4CD19DA-EE08-5225-FB19-1D0DFA4113DD}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\stoplight.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "StopLight.cs",
+              "DocumentMoniker": "E:\\GitHub\\AI-in-Games\\Assets\\Scripts\\StopLight.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\StopLight.cs",
+              "ToolTip": "E:\\GitHub\\AI-in-Games\\Assets\\Scripts\\StopLight.cs",
+              "RelativeToolTip": "Assets\\Scripts\\StopLight.cs",
+              "ViewState": "AgIAAA4AAAAAAAAAAADwvxoAAAAjAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-20T08:42:52.193Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "CarAI.cs",
+              "DocumentMoniker": "E:\\GitHub\\AI-in-Games\\Assets\\Scripts\\CarAI.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\CarAI.cs",
+              "ToolTip": "E:\\GitHub\\AI-in-Games\\Assets\\Scripts\\CarAI.cs",
+              "RelativeToolTip": "Assets\\Scripts\\CarAI.cs",
+              "ViewState": "AgIAAHsAAAAAAAAAAAAgwIcAAABAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-20T09:12:20.402Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
