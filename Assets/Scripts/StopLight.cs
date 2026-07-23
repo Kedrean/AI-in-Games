@@ -2,37 +2,116 @@ using UnityEngine;
 
 public class StopLight : MonoBehaviour
 {
-    public bool isGreen = true;
-    public float greenTime = 5f;
-    public float redTime = 5f;
+    [Header("Light Objects")]
+    public GameObject northLight;
+    public GameObject eastLight;
+    public GameObject southLight;
+    public GameObject westLight;
 
-    private float timer = 0;
+    [Header("Timing")]
+    public float greenTime = 8f;
+    public float yellowTime = 2f;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public enum Direction
     {
-        
+        North,
+        East,
+        South,
+        West
     }
 
-    // Update is called once per frame
+    private enum Phase
+    {
+        NorthSouthGreen,
+        NorthSouthYellow,
+        EastWestGreen,
+        EastWestYellow
+    }
+
+    private Phase currentPhase = Phase.NorthSouthGreen;
+    private float timer;
+
+    public bool IsGreen(Direction direction)
+    {
+        switch (currentPhase)
+        {
+            case Phase.NorthSouthGreen:
+                return direction == Direction.North || direction == Direction.South;
+
+            case Phase.EastWestGreen:
+                return direction == Direction.East || direction == Direction.West;
+
+            default:
+                return false;
+        }
+    }
+
+    void Start()
+    {
+        UpdateLights();
+    }
+
     void Update()
     {
         timer += Time.deltaTime;
 
-        if (isGreen && timer >= greenTime)
+        switch (currentPhase)
         {
-            isGreen = false;
-            timer = 0;
+            case Phase.NorthSouthGreen:
 
-            Debug.Log("RED LIGHT");
+                if (timer >= greenTime)
+                {
+                    timer = 0;
+                    currentPhase = Phase.NorthSouthYellow;
+                    UpdateLights();
+                }
+
+                break;
+
+            case Phase.NorthSouthYellow:
+
+                if (timer >= yellowTime)
+                {
+                    timer = 0;
+                    currentPhase = Phase.EastWestGreen;
+                    UpdateLights();
+                }
+
+                break;
+
+            case Phase.EastWestGreen:
+
+                if (timer >= greenTime)
+                {
+                    timer = 0;
+                    currentPhase = Phase.EastWestYellow;
+                    UpdateLights();
+                }
+
+                break;
+
+            case Phase.EastWestYellow:
+
+                if (timer >= yellowTime)
+                {
+                    timer = 0;
+                    currentPhase = Phase.NorthSouthGreen;
+                    UpdateLights();
+                }
+
+                break;
         }
+    }
 
-        else if (!isGreen && timer >= redTime)
-        {
-            isGreen = true;
-            timer = 0;
+    void UpdateLights()
+    {
+        bool nsGreen = currentPhase == Phase.NorthSouthGreen;
+        bool ewGreen = currentPhase == Phase.EastWestGreen;
 
-            Debug.Log("GREEN LIGHT");
-        }
+        northLight.SetActive(nsGreen);
+        southLight.SetActive(nsGreen);
+
+        eastLight.SetActive(ewGreen);
+        westLight.SetActive(ewGreen);
     }
 }

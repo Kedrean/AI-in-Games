@@ -3,11 +3,13 @@ using UnityEngine.AI;
 
 public class CarAI : MonoBehaviour
 {
-    [Header("Waypoints")]
+    [Header("Route")]
     public Transform[] destination;
-    public int currentWaypointIndex = 0;
+
+    private int currentWaypointIndex;
 
     [Header("Traffic Light")]
+    public StopLight.Direction myDirection;
     public StopLight trafficLight;
     public Transform stopPoint;
     public float stopDistance = 2f;
@@ -17,9 +19,10 @@ public class CarAI : MonoBehaviour
     public float slowSpeed = 2.5f;
 
     [Header("Car Detection")]
-    public float carDetectionDistance = 4f;
-    public float carDetectionRadius = 0.6f;
+    public float carDetectionDistance = 5f;
+    public float carDetectionRadius = 1f;
     public LayerMask carLayer;
+    public Vector3 sensorOffset = new Vector3(0, 0.5f, 0);
 
     private NavMeshAgent carAgent;
 
@@ -28,14 +31,14 @@ public class CarAI : MonoBehaviour
         carAgent = GetComponent<NavMeshAgent>();
         carAgent.speed = normalSpeed;
 
-        MoveToCurrentWaypoint();
+        if (destination != null && destination.Length > 0)
+            MoveToCurrentWaypoint();
     }
 
     void Update()
     {
         FollowTrafficLight();
 
-        // Don't continue if stopped
         if (carAgent.isStopped)
             return;
 
@@ -48,9 +51,25 @@ public class CarAI : MonoBehaviour
         }
     }
 
+    public void SetRoute(Transform routeParent)
+    {
+        destination = new Transform[routeParent.childCount];
+
+        for (int i = 0; i < routeParent.childCount; i++)
+        {
+            destination[i] = routeParent.GetChild(i);
+        }
+
+        currentWaypointIndex = 0;
+
+        if (carAgent == null)
+            carAgent = GetComponent<NavMeshAgent>();
+
+        MoveToCurrentWaypoint();
+    }
+
     private void FollowTrafficLight()
     {
-        // Stop if another car is directly ahead
         if (IsCarAhead())
         {
             carAgent.isStopped = true;
@@ -58,21 +77,28 @@ public class CarAI : MonoBehaviour
             return;
         }
 
-        float distanceToStopPoint = Vector3.Distance(transform.position, stopPoint.position);
+        Vector3 toStopPoint = stopPoint.position - transform.position;
 
-        // Red light - stop
-        if (!trafficLight.isGreen && distanceToStopPoint <= stopDistance * 2)
+        bool stopPointAhead = Vector3.Dot(transform.forward, toStopPoint) > 0;
+        float distance = toStopPoint.magnitude;
+
+        if (!stopPointAhead)
+        {
+            carAgent.isStopped = false;
+            carAgent.speed = normalSpeed;
+            return;
+        }
+
+        if (!trafficLight.IsGreen(myDirection) && distance <= stopDistance)
         {
             carAgent.isStopped = true;
             carAgent.speed = 0;
         }
-        // Red light - slow down
-        else if (!trafficLight.isGreen && distanceToStopPoint <= stopDistance * 4)
+        else if (!trafficLight.IsGreen(myDirection) && distance <= stopDistance * 2f)
         {
             carAgent.isStopped = false;
             carAgent.speed = slowSpeed;
         }
-        // Green light - normal speed
         else
         {
             carAgent.isStopped = false;
@@ -82,21 +108,19 @@ public class CarAI : MonoBehaviour
 
     private bool IsCarAhead()
     {
-        Vector3 origin = transform.position + Vector3.up * 0.5f;
+        Vector3 origin = transform.TransformPoint(sensorOffset);
 
-        if (Physics.SphereCast(
-                origin,
-                carDetectionRadius,
-                transform.forward,
-                out RaycastHit hit,
-                carDetectionDistance,
-                carLayer))
+        Collider[] hits = Physics.OverlapSphere(
+            origin + transform.forward * carDetectionDistance,
+            carDetectionRadius,
+            carLayer);
+
+        foreach (Collider hit in hits)
         {
-            // Ignore ourselves
-            if (hit.transform != transform)
-            {
-                return true;
-            }
+            if (hit.transform == transform)
+                continue;
+
+            return true;
         }
 
         return false;
@@ -116,7 +140,8 @@ public class CarAI : MonoBehaviour
 
         if (currentWaypointIndex >= destination.Length)
         {
-            currentWaypointIndex = 0;
+            Destroy(gameObject);
+            return;
         }
 
         MoveToCurrentWaypoint();
@@ -126,9 +151,15 @@ public class CarAI : MonoBehaviour
     {
         Gizmos.color = Color.red;
 
-        Vector3 origin = transform.position + Vector3.up * 0.5f;
+        Vector3 origin = transform.TransformPoint(sensorOffset);
 
-        Gizmos.DrawLine(origin, origin + transform.forward * carDetectionDistance);
-        Gizmos.DrawWireSphere(origin + transform.forward * carDetectionDistance, carDetectionRadius);
+        Gizmos.DrawWireSphere(origin, carDetectionRadius);
+
+        Gizmos.DrawLine(origin,
+            origin + transform.forward * carDetectionDistance);
+
+        Gizmos.DrawWireSphere(
+            origin + transform.forward * carDetectionDistance,
+            carDetectionRadius);
     }
 }
