@@ -1,16 +1,34 @@
-using UnityEngine;
+using Assets.Scripts.Abilities;
+using Assets.Scripts.Core;
 
-public class PassiveAbility : MonoBehaviour
+namespace Assets.Scripts.Abilities
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    /// <summary>
+    /// Base class for passive abilities.
+    /// Passive abilities do not have cooldowns and cannot be manually cast.
+    /// They react to gameplay events or continuously apply effects.
+    /// </summary>
+    public abstract class PassiveAbility : Ability
     {
-        
-    }
+        /// <summary>
+        /// Passive abilities are always considered available.
+        /// </summary>
+        public override bool CanExecute(UnitController caster, UnitController target)
+        {
+            return true;
+        }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        /// <summary>
+        /// Called once when the passive is initialized.
+        /// </summary>
+        public virtual void Initialize(UnitController owner)
+        {
+        }
+
+        /// <summary>
+        /// Executes the passive's effect.
+        /// Derived classes define the actual behavior.
+        /// </summary>
+        public abstract override void Execute(UnitController caster, UnitController target);
     }
 }
