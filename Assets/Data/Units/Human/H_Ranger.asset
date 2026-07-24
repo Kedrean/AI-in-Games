@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6fed807f69f4cb74e8e7d2a3c32a16fb, type: 3}
+  m_Name: H_Ranger
+  m_EditorClassIdentifier: Assembly-CSharp::Assets.Scripts.Data.UnitData
+  _displayName: Ranger
+  _team: 0
+  _unitClass: 3
+  _maxHealth: 115
+  _attack: 45
+  _defense: 10
+  _moveSpeed: 3.5
+  _attackSpeed: 15
+  _attackRange: 10
+  _criticalChance: 0.05
+  _criticalMultiplier: 1.5
+  _projectilePrefab: {fileID: 2027249189681410757, guid: dad8bfae4cd38e64687f1a215a6e4d75, type: 3}
+  _animatorController: {fileID: 9100000, guid: 9d7d18a5af0e8344ea29ddedfea5da48, type: 2}
+  _abilities: []

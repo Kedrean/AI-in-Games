@@ -50,29 +50,29 @@ namespace Assets.Scripts.Core
 
         private void Start()
         {
+            if (_health != null)
+            {
+                _health.Died += HandleDeath;
+            }
+
             if (TeamManager.Instance != null)
             {
                 TeamManager.Instance.RegisterUnit(this);
                 _registered = true;
-            }
-
-            if (_health != null)
-            {
-                _health.Died += HandleDeath;
             }
         }
 
 
         private void HandleDeath()
         {
-            if (!_registered)
-                return;
-
-            if (TeamManager.Instance != null)
+            if (_registered &&
+                TeamManager.Instance != null)
             {
                 TeamManager.Instance.UnregisterUnit(this);
                 _registered = false;
             }
+
+            Destroy(gameObject);
         }
 
 
