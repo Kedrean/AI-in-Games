@@ -19,7 +19,7 @@ MonoBehaviour:
   _attack: 45
   _defense: 10
   _moveSpeed: 3.5
-  _attackSpeed: 15
+  _attackSpeed: 5
   _attackRange: 10
   _criticalChance: 0.05
   _criticalMultiplier: 1.5
