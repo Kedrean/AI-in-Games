@@ -1,4 +1,3 @@
-using Assets.Scripts.Core;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -12,8 +11,11 @@ namespace Assets.Scripts.Core
     [RequireComponent(typeof(NavMeshAgent))]
     public sealed class Movement : MonoBehaviour
     {
-        [SerializeField] private UnitController _controller;
-        [SerializeField] private NavMeshAgent _agent;
+        [SerializeField]
+        private UnitController _controller;
+
+        [SerializeField]
+        private NavMeshAgent _agent;
 
         private UnitController _target;
 
@@ -40,11 +42,12 @@ namespace Assets.Scripts.Core
 
             if (!_target.Health.IsAlive)
             {
-                Stop();
+                ClearTarget();
                 return;
             }
 
             float attackRange = _controller.Data.AttackRange;
+
             float distance = Vector3.Distance(
                 transform.position,
                 _target.transform.position);
@@ -79,11 +82,9 @@ namespace Assets.Scripts.Core
                     Vector3 destination =
                         transform.position + direction * 2f;
 
-                    NavMeshHit hit;
-
                     if (NavMesh.SamplePosition(
                         destination,
-                        out hit,
+                        out NavMeshHit hit,
                         2f,
                         NavMesh.AllAreas))
                     {
@@ -107,25 +108,33 @@ namespace Assets.Scripts.Core
         /// </summary>
         public void MoveTo(UnitController target)
         {
-            _target = target;
-
-            if (_target == null)
+            if (target == null)
                 return;
+
+            _target = target;
 
             _agent.isStopped = false;
         }
 
         /// <summary>
-        /// Stops all movement.
+        /// Stops movement but keeps the current target.
         /// </summary>
         public void Stop()
         {
-            _target = null;
-
             _agent.isStopped = true;
             _agent.ResetPath();
 
             _controller.AnimationController.SetMoving(false);
+        }
+
+        /// <summary>
+        /// Clears the current movement target.
+        /// </summary>
+        public void ClearTarget()
+        {
+            _target = null;
+
+            Stop();
         }
 
         /// <summary>

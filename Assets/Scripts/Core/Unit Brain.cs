@@ -17,6 +17,8 @@ namespace Assets.Scripts.Core
 
         private UnitController _currentTarget;
 
+        private bool _brainEnabled;
+
         /// <summary>
         /// The unit's current combat target.
         /// </summary>
@@ -33,6 +35,17 @@ namespace Assets.Scripts.Core
                 _controller != null,
                 $"{nameof(UnitBrain)} requires a UnitController.",
                 this);
+        }
+
+        public void EnableBrain()
+        {
+            _brainEnabled = true;
+        }
+
+        public void DisableBrain()
+        {
+            _brainEnabled = false;
+            ClearTarget();
         }
 
         /// <summary>
@@ -60,12 +73,19 @@ namespace Assets.Scripts.Core
 
         private void Update()
         {
-            if (_currentTarget == null)
+            if (!_brainEnabled)
+                return;
+
+            if (_currentTarget == null || !_currentTarget.Health.IsAlive)
             {
                 AcquireTarget();
 
                 if (_currentTarget == null)
+                {
+                    _controller.Combat.StopAttack();
+                    _controller.Movement.Stop();
                     return;
+                }
             }
 
             if (!_currentTarget.Health.IsAlive)

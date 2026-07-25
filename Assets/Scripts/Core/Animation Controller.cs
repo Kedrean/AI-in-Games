@@ -13,8 +13,6 @@ namespace Assets.Scripts.Core
         private static readonly int SpawnHash = Animator.StringToHash("Spawn");
         private static readonly int IsMovingHash = Animator.StringToHash("IsMoving");
         private static readonly int AttackHash = Animator.StringToHash("Attack");
-        private static readonly int AbilityHash = Animator.StringToHash("Ability");
-        private static readonly int HitHash = Animator.StringToHash("Hit");
         private static readonly int DeathHash = Animator.StringToHash("Death");
 
         [SerializeField]
@@ -27,7 +25,8 @@ namespace Assets.Scripts.Core
                 _animator = GetComponent<Animator>();
             }
 
-            Debug.Assert(_animator != null,
+            Debug.Assert(
+                _animator != null,
                 $"{nameof(AnimationController)} requires an Animator.",
                 this);
         }
@@ -38,8 +37,6 @@ namespace Assets.Scripts.Core
         public void PlaySpawn()
         {
             _animator.ResetTrigger(AttackHash);
-            _animator.ResetTrigger(AbilityHash);
-            _animator.ResetTrigger(HitHash);
             _animator.ResetTrigger(DeathHash);
 
             _animator.SetTrigger(SpawnHash);
@@ -70,26 +67,12 @@ namespace Assets.Scripts.Core
         }
 
         /// <summary>
-        /// Plays the ability/cast animation.
-        /// </summary>
-        public void PlayAbility()
-        {
-            _animator.SetTrigger(AbilityHash);
-        }
-
-        /// <summary>
-        /// Plays the hit reaction animation.
-        /// </summary>
-        public void PlayHit()
-        {
-            _animator.SetTrigger(HitHash);
-        }
-
-        /// <summary>
         /// Plays the death animation.
         /// </summary>
         public void PlayDeath()
         {
+            _animator.ResetTrigger(AttackHash);
+            _animator.SetBool(IsMovingHash, false);
             _animator.SetTrigger(DeathHash);
         }
     }

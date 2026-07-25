@@ -23,6 +23,15 @@ namespace Assets.Scripts.Managers
             Defeat
         }
 
+        [Serializable]
+        private class ArmyUnit
+        {
+            public GameObject Prefab;
+
+            [Min(1)]
+            public int Count = 1;
+        }
+
         public BattleState CurrentState { get; private set; }
 
         public event Action BattleStarted;
@@ -42,17 +51,22 @@ namespace Assets.Scripts.Managers
         [SerializeField]
         private Transform _enemySpawnPoint;
 
-        [Header("Team Prefabs")]
+        [Header("Player Army")]
         [SerializeField]
-        private GameObject[] _playerUnits;
+        private ArmyUnit[] _playerUnits;
 
+        [Header("Enemy Army")]
         [SerializeField]
-        private GameObject[] _enemyUnits;
+        private ArmyUnit[] _enemyUnits;
 
         [Header("Spawn Settings")]
         [SerializeField]
         [Min(0.5f)]
         private float _spawnSpacing = 2f;
+
+        [SerializeField]
+        [Min(1)]
+        private int _unitsPerRow = 4;
 
         private void Awake()
         {
@@ -93,7 +107,7 @@ namespace Assets.Scripts.Managers
         }
 
         /// <summary>
-        /// Spawns both teams near their designated spawn points.
+        /// Spawns both teams.
         /// </summary>
         private void PrepareBattle()
         {
@@ -107,10 +121,10 @@ namespace Assets.Scripts.Managers
         }
 
         /// <summary>
-        /// Spawns all units around a team's origin point.
+        /// Spawns an entire army around its spawn point.
         /// </summary>
         private void SpawnTeam(
-            GameObject[] prefabs,
+            ArmyUnit[] army,
             Transform origin)
         {
             if (origin == null)
@@ -119,48 +133,48 @@ namespace Assets.Scripts.Managers
                 return;
             }
 
-            if (prefabs == null || prefabs.Length == 0)
+            if (army == null || army.Length == 0)
                 return;
 
-            int unitsPerRow = 4;
+            int spawnIndex = 0;
 
-            for (int i = 0; i < prefabs.Length; i++)
+            foreach (ArmyUnit armyUnit in army)
             {
-                GameObject prefab = prefabs[i];
-
-                if (prefab == null)
+                if (armyUnit == null)
                     continue;
 
-                int row = i / unitsPerRow;
-                int column = i % unitsPerRow;
+                if (armyUnit.Prefab == null)
+                    continue;
 
-                float xOffset =
-                    (column - (unitsPerRow - 1) * 0.5f) * _spawnSpacing;
+                for (int i = 0; i < armyUnit.Count; i++)
+                {
+                    int row = spawnIndex / _unitsPerRow;
+                    int column = spawnIndex % _unitsPerRow;
 
-                float zOffset =
-                    row * _spawnSpacing;
+                    float xOffset =
+                        (column - (_unitsPerRow - 1) * 0.5f) * _spawnSpacing;
 
-                Vector3 spawnPosition =
-                    origin.position +
-                    origin.right * xOffset +
-                    origin.forward * zOffset;
+                    float zOffset =
+                        row * _spawnSpacing;
 
-                GameObject spawned =
+                    Vector3 spawnPosition =
+                        origin.position +
+                        origin.right * xOffset +
+                        origin.forward * zOffset;
+
                     Instantiate(
-                        prefab,
+                        armyUnit.Prefab,
                         spawnPosition,
                         origin.rotation);
 
-                UnitController unit =
-                    spawned.GetComponent<UnitController>();
-
-                if (unit != null)
-                {
-                    TeamManager.Instance.RegisterUnit(unit);
+                    spawnIndex++;
                 }
             }
         }
 
+        /// <summary>
+        /// Checks whether either team has been eliminated.
+        /// </summary>
         private void CheckBattleResult()
         {
             var playerUnits =
@@ -188,8 +202,8 @@ namespace Assets.Scripts.Managers
         {
             CurrentState =
                 playerWon
-                ? BattleState.Victory
-                : BattleState.Defeat;
+                    ? BattleState.Victory
+                    : BattleState.Defeat;
 
             BattleEnded?.Invoke();
         }

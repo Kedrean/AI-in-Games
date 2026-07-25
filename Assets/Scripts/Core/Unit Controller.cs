@@ -1,5 +1,6 @@
 using Assets.Scripts.Data;
 using Assets.Scripts.Managers;
+using System.Collections;
 using UnityEngine;
 
 namespace Assets.Scripts.Core
@@ -30,9 +31,8 @@ namespace Assets.Scripts.Core
         [SerializeField]
         private AnimationController _animationController;
 
-
         private bool _registered;
-
+        private bool _isDying;
 
         public UnitData Data => _unitData;
         public Health Health => _health;
@@ -41,32 +41,75 @@ namespace Assets.Scripts.Core
         public UnitBrain Brain => _brain;
         public AnimationController AnimationController => _animationController;
 
-
         private void Awake()
         {
             ValidateReferences();
         }
 
-
         private void Start()
         {
-            if (_health != null)
-            {
-                _health.Died += HandleDeath;
-            }
-
             if (TeamManager.Instance != null)
             {
                 TeamManager.Instance.RegisterUnit(this);
                 _registered = true;
             }
+
+            if (_health != null)
+            {
+                _health.Died += HandleDeath;
+            }
+
+            // Prevent AI from acting until the spawn animation finishes.
+            _brain.DisableBrain();
+
+            // Play spawn animation.
+            _animationController.PlaySpawn();
         }
 
+        /// <summary>
+        /// Called by an Animation Event at the end of the Spawn animation.
+        /// </summary>
+        public void EnableBrain()
+        {
+            if (_isDying)
+                return;
+
+            _brain.EnableBrain();
+        }
 
         private void HandleDeath()
         {
-            if (_registered &&
-                TeamManager.Instance != null)
+            if (_isDying)
+                return;
+
+            _isDying = true;
+
+            StartCoroutine(DeathRoutine());
+        }
+
+        /// <summary>
+        /// Stops gameplay and plays the death animation.
+        /// The unit is destroyed by an Animation Event.
+        /// </summary>
+        private IEnumerator DeathRoutine()
+        {
+            _brain.DisableBrain();
+            _combat.StopAttack();
+            _movement.Stop();
+
+            _animationController.PlayDeath();
+
+            // Wait until FinishDeath() is called by the animation.
+            yield break;
+        }
+
+        /// <summary>
+        /// Called by an Animation Event on the last frame
+        /// of the Death animation.
+        /// </summary>
+        public void FinishDeath()
+        {
+            if (_registered && TeamManager.Instance != null)
             {
                 TeamManager.Instance.UnregisterUnit(this);
                 _registered = false;
@@ -74,7 +117,6 @@ namespace Assets.Scripts.Core
 
             Destroy(gameObject);
         }
-
 
         private void OnDestroy()
         {
@@ -90,14 +132,12 @@ namespace Assets.Scripts.Core
             }
         }
 
-
 #if UNITY_EDITOR
         private void OnValidate()
         {
             AutoAssignComponents();
         }
 #endif
-
 
         private void AutoAssignComponents()
         {
@@ -116,7 +156,6 @@ namespace Assets.Scripts.Core
             if (_animationController == null)
                 _animationController = GetComponent<AnimationController>();
         }
-
 
         private void ValidateReferences()
         {

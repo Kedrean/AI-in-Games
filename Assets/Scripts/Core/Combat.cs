@@ -20,6 +20,11 @@ namespace Assets.Scripts.Core
         private Transform _projectileSpawnPoint;
 
         private Coroutine _attackCoroutine;
+        private UnitController _currentTarget;
+
+        // Stores the current attack until the animation releases it.
+        private UnitController _pendingTarget;
+        private int _pendingDamage;
 
         public bool IsAttacking => _attackCoroutine != null;
 
@@ -47,8 +52,15 @@ namespace Assets.Scripts.Core
             if (!target.Health.IsAlive)
                 return;
 
+            if (_attackCoroutine != null &&
+                _currentTarget == target)
+            {
+                return;
+            }
+
             StopAttack();
 
+            _currentTarget = target;
             _attackCoroutine = StartCoroutine(AttackRoutine(target));
         }
 
@@ -57,11 +69,15 @@ namespace Assets.Scripts.Core
         /// </summary>
         public void StopAttack()
         {
-            if (_attackCoroutine == null)
-                return;
+            if (_attackCoroutine != null)
+            {
+                StopCoroutine(_attackCoroutine);
+            }
 
-            StopCoroutine(_attackCoroutine);
             _attackCoroutine = null;
+            _currentTarget = null;
+            _pendingTarget = null;
+            _pendingDamage = 0;
         }
 
         /// <summary>
@@ -81,10 +97,6 @@ namespace Assets.Scripts.Core
         private IEnumerator AttackRoutine(UnitController target)
         {
             UnitData attacker = _controller.Data;
-            UnitData defender = target.Data;
-
-            float attackInterval = 1f / attacker.AttackSpeed;
-            WaitForSeconds attackDelay = new WaitForSeconds(attackInterval);
 
             while (target != null && target.Health.IsAlive)
             {
@@ -99,23 +111,46 @@ namespace Assets.Scripts.Core
 
                     int damage = DamageSystem.CalculateDamage(
                         attacker.Attack,
-                        defender.Defense,
+                        target.Data.Defense,
                         0,
                         critical,
                         attacker.CriticalMultiplier);
 
-                    PerformAttack(target, damage);
+                    _pendingTarget = target;
+                    _pendingDamage = damage;
 
-                    if (_controller.AnimationController != null)
-                    {
-                        _controller.AnimationController.PlayAttack();
-                    }
+                    _controller.AnimationController.PlayAttack();
+
+                    yield return new WaitForSeconds(
+                        1f / attacker.AttackSpeed);
                 }
-
-                yield return attackDelay;
+                else
+                {
+                    yield return null;
+                }
             }
 
             _attackCoroutine = null;
+            _currentTarget = null;
+        }
+
+        /// <summary>
+        /// Called by an Animation Event on the attack animation.
+        /// </summary>
+        public void ReleaseAttack()
+        {
+            if (_pendingTarget == null)
+                return;
+
+            if (!_pendingTarget.Health.IsAlive)
+                return;
+
+            PerformAttack(
+                _pendingTarget,
+                _pendingDamage);
+
+            _pendingTarget = null;
+            _pendingDamage = 0;
         }
 
         private void PerformAttack(UnitController target, int damage)
@@ -130,10 +165,11 @@ namespace Assets.Scripts.Core
                     ? _projectileSpawnPoint.position
                     : transform.position;
 
-                GameObject projectileObject = Instantiate(
-                    attacker.ProjectilePrefab,
-                    spawnPosition,
-                    Quaternion.identity);
+                GameObject projectileObject =
+                    Instantiate(
+                        attacker.ProjectilePrefab,
+                        spawnPosition,
+                        Quaternion.identity);
 
                 Projectile projectile =
                     projectileObject.GetComponent<Projectile>();
